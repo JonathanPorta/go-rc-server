@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"./gpio"
 )
 
 var clients []Client
@@ -47,12 +48,18 @@ func handleMessage(messageChannel <-chan Message) {
 		fmt.Printf("A message has been receieved: '%s'", message.message)
 		if message.message == "up\n" {
 			fmt.Println("WE GOT AN UP!")
+			gpio.WriteToPin("15")
+//			gpio.WriteToPin("18")
+			gpio.WriteToPin("17")
 		} else if message.message == "down\n" {
 			fmt.Println("WE GOT A DOWN!")
 		} else if message.message == "left\n" {
 			fmt.Println("WE GOT A LEFT!")
 		} else if message.message == "right\n" {
 			fmt.Println("WE GOT A RIGHT!")
+		} else if message.message == "stop\n" {
+                        fmt.Println("WE GOT A RIGHT!")			
+			gpio.Reset()
 		}
 
 		for _, c := range clients {
@@ -75,6 +82,8 @@ func logConnection(event string, connection net.Conn) {
 }
 
 func main() {
+	gpio.Reset()
+	defer gpio.Reset()
 	flag.Parse()
 	port := flag.Arg(0)
 
